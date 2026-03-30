@@ -31,9 +31,28 @@ export const getAllCoursesController = async (req, res) => {
 
     const courses = await Course.find(query).lean();
 
+
+    // 5️⃣ Calculate average rating for each course
+    const coursesWithRating = courses.map((course) => {
+      const totalRatings = course.ratings?.length || 0;
+      const averageRating =
+        totalRatings > 0
+          ? parseFloat(
+            (course.ratings.reduce((sum, r) => sum + r.value, 0) / totalRatings).toFixed(1)
+          )
+          : 0;
+
+      return {
+        ...course,
+        rating: averageRating,   // ✅ average rating field
+        totalRatings,            // ✅ total number of ratings
+      };
+    });
+
+
     return res.json({
       success: true,
-      courses
+      coursesWithRating
     });
 
   } catch (error) {

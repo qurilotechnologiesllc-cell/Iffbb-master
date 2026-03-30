@@ -7,9 +7,10 @@ import { getUserProfileController } from '../../controllers/user/data/getUserPro
 import { getUserOneCourseController } from '../../controllers/user/courses/getUserOneCourseController.js';
 import markModuleCompleteController from '../../controllers/user/courses/markModuleCompleteController.js';
 import submitTestController from '../../controllers/user/courses/submitTestController.js';
-import getTestResultController from"../../controllers/user/courses/getTestResultController.js";
+import getTestResultController from "../../controllers/user/courses/getTestResultController.js";
+// ✅ Correct - named import
+import { AddRatingInCourse } from "../../controllers/user/courses/addRatingInCourseController.js"
 // Middlewares
-import optionalAuthMiddleware from '../../middleware/optionalUserAuthMiddleware.js';
 import userAuthMiddleware from '../../middleware/userAuthMiddleware.js';
 
 
@@ -69,11 +70,11 @@ router.get(
   getTestResultController
 );
 
+router.post(
+  "/course/user-rating",
+  userAuthMiddleware,
+  AddRatingInCourse
+)
 
-/**
- * 🌍 Public + Optional Auth
- * Guest → limited data (no assetLink)
- * Logged-in & purchased → full access
- */
 
 export default router;
