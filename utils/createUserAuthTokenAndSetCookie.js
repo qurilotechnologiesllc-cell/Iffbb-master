@@ -1,9 +1,10 @@
 import { SignJWT } from 'jose';
 
-const createUserAuthTokenAndSetCookie = async (userId, email, res) => {
+const createUserAuthTokenAndSetCookie = async (payload, res) => {
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
-  const token = await new SignJWT({ userId, email })
+
+  const token = await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('3d')

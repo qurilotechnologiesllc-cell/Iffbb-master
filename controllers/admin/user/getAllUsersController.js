@@ -11,19 +11,37 @@ const getAllUsersController = async (req, res) => {
 
     for (const user of users) {
 
+      // ✅ Check if loginTime is more than 1 day old → mark Offline
+      let currentStatus = user.status;
+
+      if (user.logintime) {
+        const now = new Date();
+        const lastLogin = new Date(user.logintime);
+        
+        const diffInDays = (now - lastLogin) / (1000 * 60 * 60 * 24);
+
+        if (diffInDays > 1) {
+          currentStatus = 'Offline';
+
+          // ✅ Persist the status update in DB
+          await User.updateOne(
+            { _id: user._id },
+            { $set: { status: 'Offline' } }
+          );
+        }
+      }
+
+      // ✅ Fetch purchased course details
       let purchasedCourseDetails = [];
 
       if (user.purchasedCourses && user.purchasedCourses.length > 0) {
 
-        // 1️⃣ Find purchases
         const purchases = await Purchase.find({
           _id: { $in: user.purchasedCourses }
         }).select("course");
 
-        // 2️⃣ Extract courseIds
         const courseIds = purchases.map(p => p.course);
 
-        // 3️⃣ Find courses
         const courses = await Course.find({
           _id: { $in: courseIds }
         });
@@ -33,6 +51,7 @@ const getAllUsersController = async (req, res) => {
 
       updatedUsers.push({
         ...user,
+        status: currentStatus,         // ✅ updated status
         purchasedCourses: purchasedCourseDetails
       });
     }

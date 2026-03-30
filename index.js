@@ -11,8 +11,6 @@ import adminCourseRoutes from './routes/admin/adminCourseRoutes.js';
 import adminDataRoutes from './routes/admin/adminDataRoutes.js';
 import paymentRoutes from './routes/payments/paymentRoutes.js';
 import cookieParser from 'cookie-parser';
-import userAuthMiddleware from './middleware/userAuthMiddleware.js';
-import adminAuthMiddleware from './middleware/adminAuthMiddleware.js';
 import adminNewsRoutes from "./routes/admin/adminNewsRoutes.js";
 import newsRoutes from "./routes/common/newsRoutes.js";
 import courseInquiryRoutes from "./routes/common/courseInquiryRoutes.js";

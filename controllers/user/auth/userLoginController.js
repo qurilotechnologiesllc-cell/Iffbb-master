@@ -1,6 +1,5 @@
 import User from '../../../models/userModel.js';
 import bcrypt from 'bcrypt';
-
 import { validationResult } from 'express-validator';
 import createUserAuthTokenAndSetCookie from '../../../utils/createUserAuthTokenAndSetCookie.js';
 
@@ -28,11 +27,10 @@ const userLoginController = async (req, res) => {
     if (isExistingUser.isBannedByAdmin) {
       return res.status(400).json({ message: 'You are banned' });
     }
-    const token = await createUserAuthTokenAndSetCookie(
-      String(isExistingUser._id),
-      isExistingUser.email,
-      res,
-    );
+
+    await isExistingUser.updateOne({ $set: { logintime: new Date() }});
+
+    const token = await createUserAuthTokenAndSetCookie({ userId: String(isExistingUser._id), email: isExistingUser.email, name: isExistingUser.name }, res);
 
     res.status(200).json({ message: 'Logged in successfully', token });
   } catch (error) {

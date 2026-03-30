@@ -7,7 +7,6 @@ import { useSignUpValidator } from '../../validators/userSignUpValidator.js';
 import { userLoginValidator } from '../../validators/userLogInValidator.js';
 import { authenticateUser } from '../../utils/middlwares.js';
 import getUserProfileController from '../../controllers/admin/user/profile/getUserProfileController.js';
-import userAuthMiddleware from '../../middleware/userAuthMiddleware.js';
 
 const router = express.Router();
 
