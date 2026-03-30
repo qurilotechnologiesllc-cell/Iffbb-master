@@ -3,7 +3,7 @@ import CourseInquiry from "../../../models/courseInquiryModel.js";
 
 export const getAllCourseInquiriesController = async (req, res) => {
   try {
-    const inquiries = await CourseInquiry.find().sort({ createdAt: -1 });
+    const inquiries = await CourseInquiry.find({ status: { $ne: "seen" } }).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -20,7 +20,7 @@ export const getAllCourseInquiriesController = async (req, res) => {
 };
 
 
-export const seeenNotificationController = async (req, res) => {
+export const seenNotificationController = async (req, res) => {
   try {
     const { notification_id } = req.params
 
@@ -50,4 +50,43 @@ export const seeenNotificationController = async (req, res) => {
     });
   }
 }
+
+export const deleteNotification = async (req, res) => {
+  try {
+    const { notification_id } = req.params;
+
+    // Check if notification exists
+    const notification = await CourseInquiry.findById(notification_id);
+
+    if (!notification) {
+      return res.status(404).json({
+        success: false,
+        message: "Notification not found",
+      });
+    }
+
+    // Delete the notification
+    await CourseInquiry.findByIdAndDelete(notification_id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Notification deleted successfully",
+    });
+
+  } catch (error) {
+    // Handle invalid MongoDB ObjectId format
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid notification ID format",
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
 
