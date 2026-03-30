@@ -28,6 +28,11 @@ const getAllUsersController = async (req, res) => {
             { _id: user._id },
             { $set: { status: 'Offline' } }
           );
+        }else{
+          await User.updateOne(
+            { _id: user._id },
+            { $set: { status: 'Active' } }
+          );
         }
       }
 
