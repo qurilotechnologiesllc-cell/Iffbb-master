@@ -17,4 +17,10 @@ router.get(
   seenNotificationController
 )
 
+router.get(
+  "/delete-notification/:notification_id",
+  adminAuthMiddleware,
+  deleteNotification
+)
+
 export default router;
