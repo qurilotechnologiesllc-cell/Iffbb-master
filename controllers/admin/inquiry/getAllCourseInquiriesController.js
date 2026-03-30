@@ -1,4 +1,3 @@
-import { param } from "express-validator";
 import CourseInquiry from "../../../models/courseInquiryModel.js";
 
 export const getAllCourseInquiriesController = async (req, res) => {

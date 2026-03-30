@@ -17,7 +17,7 @@ router.get(
   seenNotificationController
 )
 
-router.get(
+router.delete(
   "/delete-notification/:notification_id",
   adminAuthMiddleware,
   deleteNotification
