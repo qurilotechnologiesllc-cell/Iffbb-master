@@ -33,9 +33,11 @@ app.use(
   cors({
     origin: [
       "https://ifbb-admin-7wp6.vercel.app",
-      "https://ifbb-frontend-main-f6sr.vercel.app",
+      "https://ifbb-frontend-main-f6sr.vercel.app", 
       "https://ifbb-admin.vercel.app",
       "https://ifbb-frontend.vercel.app",
+      "https://ifbb-frontend-umber.vercel.app",
+      "https://ifbb-admin-five.vercel.app",
       "http://localhost:5001",
       "http://localhost:3000",
       "http://localhost:3001",
