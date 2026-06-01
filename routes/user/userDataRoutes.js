@@ -2,7 +2,7 @@ import express from 'express';
 
 // Controllers
 import userPurchasedCoursesController from '../../controllers/user/courses/userPurchasedCoursesController.js';
-import { getAllCoursesController } from '../../controllers/user/courses/getAllCoursesController.js';
+import { getAllCoursesController, getallCoursestitle } from '../../controllers/user/courses/getAllCoursesController.js';
 import { getUserProfileController } from '../../controllers/user/data/getUserProfileController.js';
 import { getUserOneCourseController } from '../../controllers/user/courses/getUserOneCourseController.js';
 import markModuleCompleteController from '../../controllers/user/courses/markModuleCompleteController.js';
@@ -74,7 +74,12 @@ router.post(
   "/course/user-rating",
   userAuthMiddleware,
   AddRatingInCourse
-)
+);
+
+router.get(
+  "/get-all-courses-title",
+  getallCoursestitle
+);
 
 
 export default router;

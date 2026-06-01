@@ -64,3 +64,20 @@ export const getAllCoursesController = async (req, res) => {
     });
   }
 };
+
+export const getallCoursestitle = async (req, res) => {
+  try {
+    const courses = await Course.find({}, 'title'); // Only select the title field
+
+    return res.status(200).json({
+      success: true,
+      courses: courses,
+    });
+  } catch (error) {
+    console.error('Error fetching course titles:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Could not fetch course titles',
+    });
+  }
+};
