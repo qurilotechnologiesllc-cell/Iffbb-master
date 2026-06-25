@@ -7,6 +7,9 @@ export const editModuleController = async (req, res) => {
   const { title, description } = req.body;
   const file = req.file;
 
+  console.log(file);
+  
+
   try {
     const course = await Course.findById(courseId);
     if (!course) return res.status(404).json({ message: "Course not found" });
