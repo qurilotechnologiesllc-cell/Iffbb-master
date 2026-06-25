@@ -15,14 +15,14 @@ const router = express.Router();
 
 router.post(
   '/create-course',
-  getUploader('memory').single('thumbnail'),
+  getUploader().single('thumbnail'),
   addCourseController
 );
 
 router.post(
   "/add-module-to-course/:courseId",
   adminAuthMiddlware,
-  getUploader("disk").array("assets", 10), // max 10 files
+  getUploader().array("assets", 10), // max 10 files
   addModuleController
 );
 
@@ -53,7 +53,7 @@ router.delete(
 router.patch(
   "/edit-course/:courseId",
   adminAuthMiddlware,
-  getUploader("disk").single("thumbnail"),
+  getUploader().single("thumbnail"),  // disk → memory
   editCourseController
 );
 
@@ -61,7 +61,7 @@ router.patch(
 router.patch(
   '/edit-module/:courseId/:moduleId',
   adminAuthMiddlware,
-  getUploader('disk').single('assets'),
+  getUploader().single('assets'),
   editModuleController
 );
 

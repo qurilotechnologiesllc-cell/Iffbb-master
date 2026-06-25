@@ -1,14 +1,12 @@
 import fs from "fs";
 import path from "path";
 import Course from "../../../models/courseModel.js";
+import cloudinary, { uploadBufferToCloudinary } from '../../../utils/cloudinaryConfig.js'
 
 export const editModuleController = async (req, res) => {
   const { courseId, moduleId } = req.params;
   const { title, description } = req.body;
   const file = req.file;
-
-  console.log(file);
-  
 
   try {
     const course = await Course.findById(courseId);
@@ -21,20 +19,28 @@ export const editModuleController = async (req, res) => {
     if (description) module.description = description;
 
     if (file) {
-      // ✅ assetLink array hai — pehli value se old file nikalo
+      // ✅ Old Cloudinary file delete karo
       if (module.assetLink && module.assetLink.length > 0) {
-        const oldFileName = module.assetLink[0].split("/uploads/")[1];
-        const oldFilePath = path.join(process.cwd(), "uploads", oldFileName);
+        const oldUrl = module.assetLink[0];
+        // Cloudinary public_id nikalo URL se
+        const publicId = oldUrl
+          .split("/upload/")[1]
+          .replace(/^v\d+\//, "")
+          .replace(/\.[^/.]+$/, "");
 
-        if (fs.existsSync(oldFilePath)) {
-          fs.unlinkSync(oldFilePath);
-        }
+        await cloudinary.uploader.destroy(publicId, {
+          resource_type: "raw"  // PDF ke liye raw
+        });
       }
 
-      const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${file.filename}`;
-
-      // ✅ Array mein assign karo
-      module.assetLink = [fileUrl];
+      // ✅ Buffer se directly Cloudinary pe upload
+      const result = await uploadBufferToCloudinary(file.buffer, {
+        folder: "modules",
+        resource_type: "raw",  // PDF ke liye raw
+        public_id: `${Date.now()}_${file.originalname.replace(/\s+/g, '_')}`, // ✅ original naam se upload
+        format: "pdf"  // ✅ yeh lagao — Cloudinary extension save karega
+      });
+      module.assetLink = [result.secure_url];
     }
 
     await course.save();

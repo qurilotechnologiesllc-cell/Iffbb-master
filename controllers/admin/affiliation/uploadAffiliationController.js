@@ -1,5 +1,5 @@
 import Affiliation from "../../../models/affiliationModel.js";
-import cloudinary from "../../../utils/cloudinaryConfig.js"; // ✅ semicolon added
+import { uploadBufferToCloudinary } from "../../../utils/cloudinaryConfig.js";
 
 const uploadAffiliationController = async (req, res) => {
   try {
@@ -7,8 +7,10 @@ const uploadAffiliationController = async (req, res) => {
       return res.status(400).json({ message: "Image is required" });
     }
 
-    const result = await cloudinary.uploader.upload(req.file.path, {
+    // ✅ buffer se upload — disk touch nahi hoga
+    const result = await uploadBufferToCloudinary(req.file.buffer, {
       folder: "affiliations",
+      resource_type: "image",
     });
 
     const affiliation = await Affiliation.create({
@@ -20,13 +22,11 @@ const uploadAffiliationController = async (req, res) => {
       message: "Affiliation image uploaded successfully",
       affiliation,
     });
+
   } catch (error) {
     console.error("Upload affiliation error:", error);
-    return res
-      .status(500)
-      .json({ message: "Failed to upload affiliation image" });
+    return res.status(500).json({ message: "Failed to upload affiliation image" });
   }
 };
 
 export default uploadAffiliationController;
-

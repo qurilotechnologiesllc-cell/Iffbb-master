@@ -12,7 +12,7 @@ const router = express.Router();
 router.post(
   "/news",
   adminAuthMiddleware,
-  getUploader("memory").single("image"), // ✅ ONLY CHANGE
+  getUploader().single("image"), // ✅ ONLY CHANGE
   createNewsController
 );
 
@@ -20,7 +20,7 @@ router.post(
 router.put(
   "/news/:id",
   adminAuthMiddleware,
-  getUploader("memory").single("image"), // ✅ ONLY CHANGE
+  getUploader().single("image"), // ✅ ONLY CHANGE
   updateNewsController
 );
 

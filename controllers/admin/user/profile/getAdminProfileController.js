@@ -1,7 +1,23 @@
 import Admin from "../../../../models/adminModel.js";
 import bcrypt from "bcrypt";
-import { uploadToCloudinary } from "../../../../utils/cloudinaryConfig.js";
+import { uploadToCloudinary, uploadBufferToCloudinary } from "../../../../utils/cloudinaryConfig.js";
+import cloudinary from "../../../../utils/cloudinaryConfig.js";
 import fs from "fs";
+
+const extractPublicId = (url) => {
+    try {
+        const uploadIndex = url.indexOf('/upload/');
+        if (uploadIndex === -1) return null;
+        let publicId = url.substring(uploadIndex + 8);
+        publicId = publicId.replace(/^v\d+\//, '');
+        publicId = publicId.replace(/\.[^/.]+$/, '');
+        return publicId;
+    } catch {
+        return null;
+    }
+};
+
+
 export const getAdminProfileController = async (req, res) => {
     try {
         const adminId = req.user?.userId;
@@ -34,66 +50,50 @@ export const updateAdminProfileController = async (req, res) => {
             return res.status(404).json({ success: false, message: "Admin not found" });
         }
 
-        const {
-            fullName,
-            email,
-            currentPassword,
-            newPassword,
-            confirmPassword,
-        } = req.body;
+        const { fullName, email, currentPassword, newPassword, confirmPassword } = req.body;
 
-        /* =====================
-           BASIC PROFILE UPDATE
-        ===================== */
         if (fullName) admin.fullName = fullName;
         if (email) admin.email = email;
 
-        /* =====================
-           PROFILE IMAGE UPLOAD
-        ===================== */
+        // ✅ Profile image update
         if (req.file) {
-            const imageUrl = await uploadToCloudinary(req.file.path);
-            admin.image = imageUrl;
+            // Pehle purani image Cloudinary se delete karo
+            if (admin.image && admin.image.includes('res.cloudinary.com')) {
+                const publicId = extractPublicId(admin.image);
+                if (publicId) {
+                    await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+                }
+            }
 
-            // remove temp file
-            fs.unlinkSync(req.file.path);
+            // Nayi image buffer se upload karo
+            const result = await uploadBufferToCloudinary(req.file.buffer, {
+                folder: "admin_profiles",
+                resource_type: "image",
+            });
+
+            admin.image = result.secure_url;
         }
 
-        /* =====================
-           PASSWORD UPDATE
-        ===================== */
+        // ✅ Password update
         if (newPassword || confirmPassword) {
             if (!currentPassword) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Current password is required",
-                });
+                return res.status(400).json({ success: false, message: "Current password is required" });
             }
 
             const isMatch = await bcrypt.compare(currentPassword, admin.password);
             if (!isMatch) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Current password is incorrect",
-                });
+                return res.status(400).json({ success: false, message: "Current password is incorrect" });
             }
 
             if (newPassword !== confirmPassword) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Passwords do not match",
-                });
+                return res.status(400).json({ success: false, message: "Passwords do not match" });
             }
 
             if (newPassword.length < 6) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Password must be at least 6 characters",
-                });
+                return res.status(400).json({ success: false, message: "Password must be at least 6 characters" });
             }
 
-            const hashedPassword = await bcrypt.hash(newPassword, 10);
-            admin.password = hashedPassword;
+            admin.password = await bcrypt.hash(newPassword, 10);
         }
 
         await admin.save();
@@ -107,12 +107,10 @@ export const updateAdminProfileController = async (req, res) => {
                 image: admin.image,
             },
         });
+
     } catch (error) {
         console.error("Update admin profile error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Could not update profile",
-        });
+        return res.status(500).json({ success: false, message: "Could not update profile" });
     }
 };
 

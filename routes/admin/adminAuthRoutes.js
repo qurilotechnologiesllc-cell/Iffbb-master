@@ -23,16 +23,15 @@ router.post("/admin-sign-up", adminSignUpValidator, adminSignUpController);
 router.post("/admin-log-in", adminLoginValidator, adminLoginController);
 router.post("/admin-log-out", adminLogOutController);
 
-// ---------- AFFILIATION UPLOAD (ADMIN ONLY) ----------
-const upload = getUploader("disk");
 
 router.post(
   "/upload-affiliation",
   adminAuthMiddleware,        // 🔐 MUST
-  upload.single("image"),     // field = image
+  getUploader().single("image"),  // disk → memory
   uploadAffiliationController
 );
 router.get("/affiliations", getAffiliationsController);
+
 router.delete(
   "/affiliation/:id",
   adminAuthMiddleware,
@@ -48,7 +47,7 @@ router.get(
 router.put(
   "/profile",
   authenticateUser,
-  upload.single("image"),
+  getUploader().single("image"),  // disk → memory
   updateAdminProfileController
 );
 

@@ -10,7 +10,7 @@ const router = express.Router();
 router.post(
   "/gallery",
   adminAuthMiddleware,
-  getUploader("disk").single("image"),
+  getUploader().single("image"),
   uploadGalleryController
 );
 

@@ -1,10 +1,9 @@
-import cloudinary from '../../../utils/cloudinaryConfig.js';
+import { uploadBufferToCloudinary } from '../../../utils/cloudinaryConfig.js';
 import Course from '../../../models/courseModel.js';
 
 export const addCourseController = async (req, res) => {
   try {
     const { title, description, price, discountedPrice, durationToComplete } = req.body;
-
     const file = req.file;
 
     if (!file) {
@@ -15,25 +14,12 @@ export const addCourseController = async (req, res) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    // Upload thumbnail to Cloudinary
-    const streamUpload = (buffer) => {
-      return new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          {
-            folder: 'course_thumbnails',
-            resource_type: 'image',
-          },
-          (error, result) => {
-            if (result) resolve(result);
-            else reject(error);
-          },
-        );
-        stream.end(buffer);
-      });
-    };
+    // ✅ streamUpload hataya — helper use karo
+    const result = await uploadBufferToCloudinary(file.buffer, {
+      folder: 'course_thumbnails',
+      resource_type: 'image',
+    });
 
-    const result = await streamUpload(file.buffer);
-    // Create course with thumbnail URL
     const course = await Course.create({
       title,
       description,
@@ -45,6 +31,7 @@ export const addCourseController = async (req, res) => {
     });
 
     return res.status(201).json({ message: 'Course created', course });
+
   } catch (err) {
     console.error('Add course error:', err);
     return res.status(500).json({ message: 'Internal server error' });

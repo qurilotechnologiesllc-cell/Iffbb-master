@@ -11,7 +11,7 @@ const router = express.Router();
 router.post(
   "/certificates",
   adminAuthMiddleware,
-  getUploader("disk").single("file"),
+  getUploader().single("file"),
   uploadCertificateController
 );
 

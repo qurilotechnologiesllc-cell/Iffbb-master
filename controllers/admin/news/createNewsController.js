@@ -1,28 +1,22 @@
 import News from "../../../models/newsModel.js";
-import cloudinary from "../../../utils/cloudinaryConfig.js";
+import { uploadBufferToCloudinary } from "../../../utils/cloudinaryConfig.js";
 
 const createNewsController = async (req, res) => {
   try {
     const { title, description, published } = req.body;
 
     if (!title || !description) {
-      return res.status(400).json({
-        success: false,
-        message: "Title and description required",
-      });
+      return res.status(400).json({ success: false, message: "Title and description required" });
     }
 
     let imageUrl = "";
 
-    // 🔥 Upload image to Cloudinary
+    // ✅ buffer se directly upload — base64 conversion hataya
     if (req.file) {
-      const result = await cloudinary.uploader.upload(
-        `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
-        {
-          folder: "news_images",
-        }
-      );
-
+      const result = await uploadBufferToCloudinary(req.file.buffer, {
+        folder: "news_images",
+        resource_type: "image",
+      });
       imageUrl = result.secure_url;
     }
 
@@ -33,18 +27,11 @@ const createNewsController = async (req, res) => {
       published: published ?? false,
     });
 
-    res.status(201).json({
-      success: true,
-      message: "News created successfully",
-      news,
-    });
+    return res.status(201).json({ success: true, message: "News created successfully", news });
+
   } catch (error) {
     console.error("Create news error:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Failed to create news",
-      error: error.message,
-    });
+    return res.status(500).json({ success: false, message: "Failed to create news", error: error.message });
   }
 };
 

@@ -7,25 +7,19 @@ const deleteGalleryController = async (req, res) => {
 
     const image = await Gallery.findById(id);
     if (!image) {
-      return res.status(404).json({
-        success: false,
-        message: "Gallery image not found",
-      });
+      return res.status(404).json({ success: false, message: "Gallery image not found" });
     }
 
-    await cloudinary.uploader.destroy(image.publicId);
+    // ✅ publicId directly use karo — resource_type add kiya
+    await cloudinary.uploader.destroy(image.publicId, { resource_type: 'image' });
+
     await image.deleteOne();
 
-    res.status(200).json({
-      success: true,
-      message: "Gallery image deleted successfully",
-    });
+    return res.status(200).json({ success: true, message: "Gallery image deleted successfully" });
+
   } catch (error) {
     console.error("Delete gallery error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete gallery image",
-    });
+    return res.status(500).json({ success: false, message: "Failed to delete gallery image" });
   }
 };
 
