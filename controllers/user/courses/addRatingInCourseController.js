@@ -62,6 +62,9 @@ export const AddRatingInCourse = async (req, res) => {
             (r) => r.userId.toString() === user_id.toString()
         );
 
+        console.log(alreadyRated);
+        
+
         if (alreadyRated) {
             return res.status(400).json({
                 success: false,

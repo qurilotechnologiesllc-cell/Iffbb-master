@@ -122,7 +122,7 @@ const CourseSchema = new Schema(
 
     ratings: [
       {
-        user: { type: Schema.Types.ObjectId, ref: 'User' },
+        userId: { type: Schema.Types.ObjectId, ref: 'User' },
         value: {
           type: Number,
           min: 1,
