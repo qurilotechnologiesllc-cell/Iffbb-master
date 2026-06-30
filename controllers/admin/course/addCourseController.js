@@ -14,6 +14,12 @@ export const addCourseController = async (req, res) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
+    if (!description || description.trim().length < 10) {
+      return res.status(400).json({
+        message: 'Description should be at least 10 characters long'
+      });
+    }
+
     // ✅ streamUpload hataya — helper use karo
     const result = await uploadBufferToCloudinary(file.buffer, {
       folder: 'course_thumbnails',
