@@ -238,7 +238,7 @@ export const sendThankYouMail = async (email, courseTitle, amount, currency) => 
 
                         <div style="text-align: center;">
 
-                            <a href="${process.env.FRONTEND_URL}/my-courses"
+                            <a href="${process.env.FRONTEND_URL}"
                                 style="
                                     display: inline-block;
                                     background-color: #4f46e5;
