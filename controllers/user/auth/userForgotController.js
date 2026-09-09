@@ -1,10 +1,10 @@
 import User from "../../../models/userModel.js"
 import redis from "../../../utils/redisClients.js"
-import sendOtpMail from "../../../utils/sendMail.js" 
+import { sendOtpMail } from "../../../utils/sendMail.js";
 import bcrypt from "bcrypt"
 
 
- export const userForgotController = async (req, res) => {
+export const userForgotController = async (req, res) => {
     try {
         const { email } = req.body;
 
@@ -27,7 +27,7 @@ import bcrypt from "bcrypt"
         // generate 6 digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000);
         console.log(otp);
-        
+
 
         // store OTP in redis (5 min expiry)
         await redis.set(`reset-password:${email}`, otp, "EX", 300);
@@ -53,8 +53,7 @@ import bcrypt from "bcrypt"
 export const verifyOtpAndUpdatePassword = async (req, res) => {
     try {
         const { otp, email, new_password } = req.body;
-        console.log(otp, email, new_password);
-        
+
         if (!otp || !email || !new_password) {
             return res.status(400).json({
                 success: false,

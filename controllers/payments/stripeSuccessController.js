@@ -3,12 +3,15 @@ import Course from "../../models/courseModel.js";
 import Purchase from "../../models/purchaseModel.js";
 import CourseProgress from "../../models/CourseProgressModel.js";
 import User from "../../models/userModel.js";
+import { sendThankYouMail } from "../../utils/sendMail.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const stripeSuccessController = async (req, res) => {
     try {
         const { session_id } = req.query;
+
+        console.log("Received session_id:", session_id);
 
         if (!session_id) {
             return res.status(400).json({
@@ -59,6 +62,18 @@ const stripeSuccessController = async (req, res) => {
                 message: "Payment already processed",
                 courseId,
             });
+        }
+
+        // 4️⃣ Send thank you email
+        try {
+            await sendThankYouMail(
+                user.email,
+                course.title,
+                session.amount_total / 100,
+                session.currency
+            );
+        } catch (emailError) {
+            console.error("Failed to send thank you email:", emailError);
         }
 
         // 5️⃣ Save purchase
