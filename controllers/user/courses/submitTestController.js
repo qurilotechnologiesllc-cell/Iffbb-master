@@ -67,11 +67,11 @@ const submitTestController = async (req, res) => {
         );
 
         moduleProgress.score = score;
-        moduleProgress.passed = score >= module.test.passPercentage;
+        moduleProgress.testPassed = score >= module.test.passPercentage;
         moduleProgress.completed = true;
 
         // 🔓 Unlock next module
-        if (moduleProgress.passed) {
+        if (moduleProgress.testPassed) {
             progress.currentUnlockedModuleIndex = Math.max(
                 progress.currentUnlockedModuleIndex,
                 moduleIndex + 1
@@ -83,7 +83,7 @@ const submitTestController = async (req, res) => {
         return res.json({
             success: true,
             score,
-            passed: moduleProgress.passed,
+            passed: moduleProgress.testPassed,
         });
     } catch (error) {
         console.error("Submit test error:", error);
