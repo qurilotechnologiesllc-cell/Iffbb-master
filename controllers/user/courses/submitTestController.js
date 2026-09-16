@@ -83,6 +83,7 @@ const submitTestController = async (req, res) => {
         return res.json({
             success: true,
             score,
+            passPercentage: module.test.passPercentage,
             passed: moduleProgress.testPassed,
         });
     } catch (error) {

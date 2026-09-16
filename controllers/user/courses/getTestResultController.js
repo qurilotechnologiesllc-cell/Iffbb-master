@@ -6,14 +6,16 @@ const getTestResultController = async (req, res) => {
         const { courseId, moduleId } = req.params;
         const userId = req.user.userId;
 
-        // 1️⃣ progress fetch
+        // 1️⃣ Progress fetch
         const progress = await CourseProgress.findOne({
             user: userId,
             course: courseId,
         });
 
         if (!progress) {
-            return res.status(404).json({ message: "Progress not found" });
+            return res.status(404).json({
+                message: "Progress not found",
+            });
         }
 
         const moduleProgress = progress.modulesProgress.find(
@@ -21,27 +23,52 @@ const getTestResultController = async (req, res) => {
         );
 
         if (!moduleProgress || moduleProgress.score == null) {
-            return res.status(400).json({ message: "Test not attempted yet" });
-        }
-
-        // ❌ agar pass nahi kiya → deny
-        if (moduleProgress.score < 60) {
-            return res.status(403).json({
-                message: "You must score at least 60% to view test result",
+            return res.status(400).json({
+                message: "Test not attempted yet",
             });
         }
 
-        // 2️⃣ course + module fetch
+        // 2️⃣ Course fetch
         const course = await Course.findById(courseId).lean();
+
+        if (!course) {
+            return res.status(404).json({
+                message: "Course not found",
+            });
+        }
+
+        // 3️⃣ Find requested module
         const module = course.modules.find(
             (m) => m._id.toString() === moduleId
         );
 
         if (!module || !module.test) {
-            return res.status(404).json({ message: "Test not found" });
+            return res.status(404).json({
+                message: "Test not found",
+            });
         }
 
-        // 3️⃣ merge question + user answer
+        // 4️⃣ Get pass percentage from course module test
+        const passPercentage = module.test.passPercentage;
+
+        if (passPercentage == null) {
+            return res.status(500).json({
+                message: "Pass percentage is not configured for this test",
+            });
+        }
+
+        console.log(moduleProgress.score, passPercentage)
+
+        // 5️⃣ Compare user's score with module's pass percentage
+        if (moduleProgress.score < passPercentage) {
+            return res.status(403).json({
+                message: `Your score (${moduleProgress.score}%) is below the required pass percentage (${passPercentage}%) for this module test`,
+                score: moduleProgress.score,
+                passPercentage,
+            });
+        }
+
+        // 6️⃣ Merge questions with user answers
         const result = module.test.questions.map((q, index) => {
             const userAnswer = moduleProgress.answers.find(
                 (a) => a.questionIndex === index
@@ -63,15 +90,20 @@ const getTestResultController = async (req, res) => {
             };
         });
 
+        // 7️⃣ Return result
         return res.json({
             success: true,
             score: moduleProgress.score,
+            passPercentage,
             totalQuestions: module.test.questions.length,
             result,
         });
     } catch (error) {
         console.error("Get test result error:", error);
-        return res.status(500).json({ message: "Server error" });
+
+        return res.status(500).json({
+            message: "Server error",
+        });
     }
 };
 
