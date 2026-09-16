@@ -57,8 +57,6 @@ const getTestResultController = async (req, res) => {
             });
         }
 
-        console.log(moduleProgress.score, passPercentage)
-
         // 5️⃣ Compare user's score with module's pass percentage
         if (moduleProgress.score < passPercentage) {
             return res.status(403).json({
