@@ -21,7 +21,7 @@ const stripeSuccessController = async (req, res) => {
         // 1. Retrieve the latest Checkout Session from Stripe.
         const session = await stripe.checkout.sessions.retrieve(session_id);
 
-        console.log("Retrieved Stripe session:", session);
+        console.log("Payment ka Status", session.payment_status);
 
         // 2. Find the existing Purchase document.
         const purchase = await Purchase.findOne({

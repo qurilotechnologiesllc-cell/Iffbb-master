@@ -79,7 +79,7 @@ const createCheckoutSession = async (req, res) => {
         `${process.env.FRONTEND_URL}/success` +
         "?session_id={CHECKOUT_SESSION_ID}",
 
-      cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+      cancel_url: `${process.env.FRONTEND_URL}/cancel?session_id={CHECKOUT_SESSION_ID}`,
 
       metadata: {
         userId: user._id.toString(),
