@@ -41,7 +41,8 @@ app.use(
       "http://localhost:5001",
       "http://localhost:3000",
       "http://localhost:3001",
-      "https://ifbb-frontend-brown.vercel.app"
+      "https://ifbb-frontend-brown.vercel.app",
+      "https://ifbbacademyaustralia.com"
     ],
     credentials: true,
   })
