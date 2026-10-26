@@ -32,15 +32,12 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: [
-      "https://ifbb-frontend-main-f6sr.vercel.app",
       "https://ifbb-frontend.vercel.app",
-      "https://ifbb-frontend-umber.vercel.app",
       "http://localhost:5001",
       "http://localhost:3000",
       "http://localhost:3001",
-      "https://ifbb-frontend-brown.vercel.app",
       "https://ifbbacademyaustralia.com",
-      "https://ifbb-admin-murex.vercel.app"
+      "https://admin.ifbbacademyaustralia.com"
     ],
     credentials: true,
   })
